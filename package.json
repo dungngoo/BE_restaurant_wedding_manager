@@ -1,0 +1,47 @@
+{
+  "name": "be",
+  "version": "1.0.0",
+  "description": "Final_Project",
+  "main": "index.js",
+  "scripts": {
+    "beautiful": "prettier --single-quote --trailing-comma all --write --tab-width 4 src/**/*.{js,json,scss}",
+    "start": "nodemon --inspect  src/index.js",
+    "watch": "node-sass --watch src/resources/scss/ -o src/public/css/",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dungngoo/Project_WebsiteManageRestaurant.git"
+  },
+  "keywords": [
+    "Website",
+    "Restaurant",
+    "FinalProject"
+  ],
+  "author": "dungngoo & thanhhoai",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dungngoo/Project_WebsiteManageRestaurant/issues"
+  },
+  "homepage": "https://github.com/dungngoo/Project_WebsiteManageRestaurant#readme",
+  "lint-staged": {
+    "src/**/*.{js,json,scss}": "prettier --single-quote --trailing-comma all --write"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "express-handlebars": "^6.0.7",
+    "lowdb": "^1.0.0",
+    "mongoose": "^6.9.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^4.6.2"
+  },
+  "devDependencies": {
+    "husky": "^8.0.3",
+    "lint-staged": "^13.1.1",
+    "morgan": "^1.10.0",
+    "node-sass": "^8.0.0",
+    "nodemon": "^2.0.20",
+    "prettier": "^2.8.4"
+  }
+}
