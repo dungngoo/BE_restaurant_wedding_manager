@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
-
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
 const staffController = require("../app/controllers/StaffController");
 
 /**
@@ -11,39 +12,58 @@ const staffController = require("../app/controllers/StaffController");
  *        type: object
  *        required:
  *           - fullname
- *           - staff_img
+ *           - email
  *           - address
+ *           - date
  *           - phonenumber
+ *           - identify
+ *           - sex
+ *           - staff_id
+ *           - birthPlace
+ *           - dateOfPlace
+ *           - staffImg
+ *           - job_type
  *        properties:
  *           staff_id:
  *              type: string
- *              description: 'The staff id'
+ *              description: 'ID nhân viên'
  *           fullname:
  *              type: string
- *              description: 'Full name of the staff'
- *           staff_img:
+ *              description: 'Họ tên'
+ *           staffImg:
  *              type: string
- *              description: 'Img 3x4 of the staff'
+ *              description: 'Ảnh thẻ 3x4'
+ *           email:
+ *              type: string
+ *              description: 'Email'
  *           address:
  *              type: string
- *              description: 'Address of the staff'
+ *              description: 'Địa chỉ'
  *           birth:
  *              type: string
- *              description: 'Bird of the staff'
+ *              description: 'Ngày sinh'
  *           sex:
  *              type: string
- *              description: 'Sex of the staff'
+ *              description: 'Giới tính'
  *           phonenumber:
  *              type: string
- *              description: 'phone number staff'
+ *              description: 'Số điện thoại'
  *           job_type:
  *              type: string
- *              description: 'Type of the job'
- *
+ *              description: 'Chức vụ nghề nghiệp'
+ *           birthPlace:
+ *              type: string
+ *              description: 'Nơi sinh'
+ *           dateOfPlace:
+ *              type: string
+ *              description: 'Ngày cấp'
+ *           identify:
+ *              type: string
+ *              description: 'Chứng minh nhân dân'
  */
 
 // example:
-//  *              staff_id: #CD12837
+//  *              staff_id: #NV1237
 //  *              fullname: 'Ngo Van Ten'
 //  *              staff_img:
 //  *              address: 349 Pham Van Sang
@@ -58,52 +78,6 @@ const staffController = require("../app/controllers/StaffController");
  *  name: Staff
  *  description: The staff managaning API
  */
-
-/**
- * @swagger
- * /staff:
- *  get:
- *    summary: Returns the list of all the staff
- *    tags: [Staff]
- *    responses:
- *      200:
- *        description: The list of the staff
- *        content:
- *          application/json:
- *             schema:
- *              type: array
- *              items:
- *                $ref: '#/components/schemas/Staff'
- */
-
-// staffController.get
-router.use("/", staffController.get);
-
-/**
- * @swagger
- * /staff/{id}:
- *   get:
- *     summary: Get the staff by id
- *     tags: [Staff]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: string
- *         required: true
- *         description: The staff id
- *     responses:
- *       200:
- *         description: The staff description by id
- *         contents:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Staff'
- *       404:
- *         description: The staff was not found
- */
-// staffController.getById
-router.use("/:id", staffController.getById);
 
 /**
  * @swagger
@@ -129,7 +103,7 @@ router.use("/:id", staffController.getById);
  */
 
 // staffController.create
-router.post("/", staffController.create);
+router.post("/", upload.single("staffImg"), staffController.create);
 
 /**
  * @swagger
@@ -168,6 +142,23 @@ router.put("/:id", staffController.update);
 
 /**
  * @swagger
+ * /staff/delete-many:
+ *   delete:
+ *     summary: Xóa tất cả nhân viên
+ *     tags: [Staff]
+ *     responses:
+ *       200:
+ *         description: Xóa thành công tất cả nhân viên
+ *       500:
+ *         description: Lỗi hệ thống
+ */
+// staffConteoller.deleteMany
+router.delete("/delete-many", staffController.deleteMany);
+
+
+
+/**
+ * @swagger
  * /staff/{id}:
  *   delete:
  *     summary: Remove the staff by id
@@ -189,5 +180,52 @@ router.put("/:id", staffController.update);
 
 // staffController.delete
 router.delete("/:id", staffController.delete);
+
+
+/**
+ * @swagger
+ * /staff/{id}:
+ *   get:
+ *     summary: Get the staff by id
+ *     tags: [Staff]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The staff id
+ *     responses:
+ *       200:
+ *         description: The staff description by id
+ *         contents:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Staff'
+ *       404:
+ *         description: The staff was not found
+ */
+// staffController.getById
+router.use("/:id", staffController.getById);
+
+/**
+ * @swagger
+ * /staff:
+ *  get:
+ *    summary: Returns the list of all the staff
+ *    tags: [Staff]
+ *    responses:
+ *      200:
+ *        description: The list of the staff
+ *        content:
+ *          application/json:
+ *             schema:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/Staff'
+ */
+
+// staffController.get
+router.use("/", staffController.get);
 
 module.exports = router;

@@ -1,11 +1,14 @@
 const express = require("express");
 // CORS
 const cors = require("cors");
-const { engine } = require("express-handlebars");
+const bodyParser = require("body-parser");
 const morgan = require("morgan");
-// const low = require('lowdb');
 const swaggerUI = require("swagger-ui-express");
 const swaggerJSDoc = require("swagger-jsdoc");
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
+require("dotenv").config();
+
 // const booksRouter = require('./routes/books');
 // const FileSync = require("lowdb/adapters/FileSync");
 
@@ -43,7 +46,6 @@ const port = 3001;
 
 const route = require("./routes");
 const db = require("./config/db");
-const { version } = require("os");
 
 // Connect to DB
 db.connect();
@@ -52,19 +54,18 @@ db.connect();
 app.use(cors());
 
 app.use(express.static(path.join(__dirname, "public")));
+app.use('/uploads',express.static('uploads'));
 
 // Middleware get post for html
 app.use(
-  express.urlencoded({
-    extended: true,
+  bodyParser.urlencoded({
+    extended: false,
   })
 );
-app.use(express.json());
+app.use(bodyParser.json());
 
 // HTTP logger
 app.use(morgan("combined"));
-
-// app.use("/books", booksRouter);
 
 // // Routes init
 route(app);
