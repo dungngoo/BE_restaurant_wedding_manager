@@ -7,6 +7,7 @@ const swaggerUI = require("swagger-ui-express");
 const swaggerJSDoc = require("swagger-jsdoc");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
+
 require("dotenv").config();
 
 // const booksRouter = require('./routes/books');
@@ -53,8 +54,9 @@ db.connect();
 // CORS
 app.use(cors());
 
+
 app.use(express.static(path.join(__dirname, "public")));
-app.use('/uploads',express.static('uploads'));
+app.use("/uploads", express.static("uploads"));
 
 // Middleware get post for html
 app.use(

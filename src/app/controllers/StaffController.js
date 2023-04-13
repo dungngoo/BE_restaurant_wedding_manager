@@ -1,6 +1,8 @@
 const { nanoid } = require("nanoid");
-const Staff = require("../models/Staff");
+const sharp = require("sharp");
 
+const Staff = require("../models/Staff");
+const uploadFileToS3 = require("../middleware/uploadImage");
 class StaffController {
   // [GET] /staff ( get all the staff members)
   get(req, res, next) {
@@ -22,12 +24,37 @@ class StaffController {
 
   //   [POST] /staff
   async create(req, res) {
+    // uploadFileToS3(req.body.pathFile, req.file, function (err, url) {
+    //   if (err) {
+    //     console.log("Error uploading file: ", err);
+    //     return res.status(400).send({ message: "Error uploading file." });
+    //   } else {
+    //     console.log("File uploaded successfully. URL: ", url);
+    //     const staff = new Staff({
+    //       staff_id: `#NV${nanoid(4)}`,
+    //       ...req.body,
+    //       staffImg: url,
+    //     });
+    //     staff.save(function (err, staff) {
+    //       if (err) {
+    //         return res
+    //           .status(400)
+    //           .send({ message: "Cann't create a staff", err: err.keyValue });
+    //       }
+    //       return res.status(200).send({
+    //         message: "Created staff successfully",
+    //         staff: staff,
+    //       });
+    //     });
+    //   }
+    // });
     try {
-      console.log(req.body);
+      console.log(req.file);
+      let imagePath = req.file.path;
       const staff = new Staff({
         staff_id: `#NV${nanoid(4)}`,
         ...req.body,
-        staffImg: req.file.path,
+        staffImg: imagePath,
       });
       await staff.save();
       return res

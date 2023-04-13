@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const multer = require("multer");
-const upload = multer({ dest: "uploads/" });
+
 const staffController = require("../app/controllers/StaffController");
+const { upload } = require("../app/middleware/uploadImage");
 
 /**
  * @swagger
@@ -103,7 +103,11 @@ const staffController = require("../app/controllers/StaffController");
  */
 
 // staffController.create
-router.post("/", upload.single("staffImg"), staffController.create);
+router.post(
+  "/",
+  upload.single("staffImg"),
+  staffController.create
+);
 
 /**
  * @swagger
@@ -155,8 +159,6 @@ router.put("/:id", staffController.update);
 // staffConteoller.deleteMany
 router.delete("/delete-many", staffController.deleteMany);
 
-
-
 /**
  * @swagger
  * /staff/{id}:
@@ -180,7 +182,6 @@ router.delete("/delete-many", staffController.deleteMany);
 
 // staffController.delete
 router.delete("/:id", staffController.delete);
-
 
 /**
  * @swagger
