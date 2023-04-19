@@ -30,20 +30,6 @@ const newsController = require("../app/controllers/NewsController");
 
 /**
  * @swagger
- * tags:
- *  name: News
- *  description: The News managaning API
- */
-
-
-
-
-
-
-router.use("/", newsController.index);
-
-/**
- * @swagger
  * /news/{id}:
  *   get:
  *     summary: Get the news by id
@@ -65,6 +51,17 @@ router.use("/", newsController.index);
  *       404:
  *         description: The book was not found
  */
+
+router.use("/:id", newsController.getById);
+
+/**
+ * @swagger
+ * tags:
+ *  name: News
+ *  description: The News managaning API
+ */
+
+router.use("/", newsController.index);
 
 /**
  * @swagger
@@ -88,7 +85,6 @@ router.use("/", newsController.index);
  *       500:
  *         description: Some server error
  */
-
 
 /**
  * @swagger
@@ -122,7 +118,6 @@ router.use("/", newsController.index);
  *        description: Some error happened
  */
 
-
 /**
  * @swagger
  * /News/{id}:
@@ -136,7 +131,7 @@ router.use("/", newsController.index);
  *           type: string
  *         required: true
  *         description: The News id
- * 
+ *
  *     responses:
  *       200:
  *         description: The News was deleted
