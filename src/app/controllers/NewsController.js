@@ -2,12 +2,11 @@ const News = require("../models/News");
 
 class NewsController {
   // [GET] /news
- 
+
   index(req, res, next) {
-    // News.find({})
-    //     .then(news => res.json(news))
-    //     .catch(next);
-    res.json({ message: "Hello, News" });
+    News.find({})
+      .then((news) => res.json(news))
+      .catch(next);
   }
 
   // [GET] /news/create
