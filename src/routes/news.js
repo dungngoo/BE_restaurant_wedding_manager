@@ -53,7 +53,6 @@ const newsController = require("../app/controllers/NewsController");
  */
 
 router.use("/:id", newsController.getById);
-
 /**
  * @swagger
  * tags:
