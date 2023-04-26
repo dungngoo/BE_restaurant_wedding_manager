@@ -1,5 +1,6 @@
 const billRouter = require("./bill");
-const courseRouter = require("./course");
+const foodRouter = require("./food");
+const menuRouter = require("./menu");
 const customerRouter = require("./customer");
 const materialRouter = require("./material");
 const newsRouter = require("./news");
@@ -10,16 +11,14 @@ const tableRouter = require("./table");
 
 function route(app) {
   app.use("/bill", billRouter);
-  app.use("/course", courseRouter);
+  app.use("/food", foodRouter);
+  app.use("/menu", menuRouter);
   app.use("/customer", customerRouter);
   app.use("/material", materialRouter);
-
-  
   app.use("/news", newsRouter);
   app.use("/promotion", promotionRouter);
   app.use("/staff", staffRouter);
   app.use("/table", tableRouter);
-
   // app.use('/', render("HOMEPAGE"));
 
   // app.use('/staff, ')
