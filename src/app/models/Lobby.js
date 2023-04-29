@@ -1,9 +1,42 @@
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
 
-const Lobby = new Schema({
-  lobby: { type: String },
-  number_lobby: { type: number},
-});
+const LobbySchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    capacity: {
+      type: Number,
+      required: true,
+    },
+    description: {
+      type: String,
+    },
+    constant: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+    },
+    imgs: {
+      type: [String], // Mảng các chuỗi đường link ảnh
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["available", "unavailable"],
+      default: "available",
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-module.exports = mongoose.model("Lobby", Lobby);
+const Lobby = mongoose.model("Lobby", LobbySchema);
+
+module.exports = Lobby;

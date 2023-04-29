@@ -1,12 +1,16 @@
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
 
-const Customer = new Schema({
-  customer_id: { type: String },
-  name: { type: String, maxLength: 255 },
-  address: { type: String },
-  phone_number: { type: String },
-  citizen_identification: { type: String },
-});
+const customerSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, maxLength: 255 },
+    email: { type: String, required: true, maxLength: 255, unique: true },
+    phone: { type: String, maxLength: 20 },
+    address: { type: String },
+    notes: { type: String },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-module.exports = mongoose.model("Customer", Customer);
+module.exports = mongoose.model("Customer", customerSchema);

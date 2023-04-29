@@ -1,11 +1,16 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const mongoose = require("mongoose");
 
-const Table = new Schema({
-    table_id: { type: String },
-    table_number: { type: Number, min: 0, max: 50 },
-    table_img: {type: String},
-})
+const tableSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, maxLength: 255 },
+    capacity: { type: Number, required: true },
+    isAvailable: { type: Boolean, default: true },
+    lobby: { type: mongoose.Schema.Types.ObjectId, ref: "Lobby" },
+    party: { type: mongoose.Schema.Types.ObjectId, ref: "Party" },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-
-module.exports = mongoose.model('Table', Table);
+module.exports = mongoose.model("Table", tableSchema);
