@@ -6,12 +6,14 @@ const promotionSchema = new mongoose.Schema(
     description: { type: String, maxLength: 2000, required: true },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
-    discount: { type: Number, required: true },
     image: { type: String, required: true },
-    status: { type: String, enum: ["active", "inactive"], required: true },
-    createdBy: {
+    serviceType: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Staff",
+      ref: "ServiceType",
+      required: true,
+    },
+    param: {
+      type: String,
       required: true,
     },
   },

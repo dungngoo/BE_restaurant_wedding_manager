@@ -40,6 +40,10 @@ const menuItemSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  type: {
+    type: String,
+    required: true,
+  },
 });
 
 module.exports = mongoose.model("MenuItem", menuItemSchema);

@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 
-const ServiceController = require("../app/controllers/ServiceController");
+const ServiceTypeController = require("../app/controllers/ServiceTypeController");
 //  ---  Lấy dịch vụ theo loại dịch vụ
-router.use("/:type", ServiceController.getServiceByType);
+router.use("/type", ServiceTypeController.getServiceTypes);
 //  ---  Lấy tất cả các dịch vụ
-router.use("/", ServiceController.getAll);
+router.use("/", ServiceTypeController.getAll);
 
 module.exports = router;

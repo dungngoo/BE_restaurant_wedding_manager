@@ -3,11 +3,6 @@ const { Schema } = mongoose;
 
 const eventSchema = new Schema(
   {
-    eventType: {
-      type: Schema.Types.ObjectId,
-      ref: "EventType",
-      required: true,
-    },
     eventDate: {
       type: Date,
       required: true,
@@ -20,7 +15,7 @@ const eventSchema = new Schema(
       type: Date,
       required: true,
     },
-    numberOfGuests: {
+    tableQuantity: {
       type: Number,
       required: true,
     },
@@ -41,10 +36,6 @@ const eventSchema = new Schema(
         service: {
           type: Schema.Types.ObjectId,
           ref: "Service",
-        },
-        quantity: {
-          type: Number,
-          required: true,
         },
       },
     ],

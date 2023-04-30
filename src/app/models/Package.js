@@ -1,18 +1,20 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const serviceSchema = new Schema({
-  serviceName: {
+const packageSchema = new Schema({
+  packageName: {
     type: String,
     required: true,
   },
-  type: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "ServiceType",
-    required: true,
-  },
+  services: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Service",
+      required: true,
+    },
+  ],
   description: {
-    type: [String],
+    type: String,
     required: true,
   },
   price: {
@@ -23,12 +25,8 @@ const serviceSchema = new Schema({
     type: [String], // Mảng các chuỗi đường link ảnh
     required: true,
   },
-  param: {
-    type: String,
-    required: true,
-  },
 });
 
-const Service = mongoose.model("Service", serviceSchema);
+const Package = mongoose.model("Package", packageSchema);
 
-module.exports = Service;
+module.exports = Package;
