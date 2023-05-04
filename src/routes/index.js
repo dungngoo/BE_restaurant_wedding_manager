@@ -4,6 +4,7 @@ const lobbiesRouter = require("./lobbies");
 const servicesRouter = require("./services");
 const packageRouter = require("./packages");
 const menuitemRouter = require("./menuitems");
+const contactRouter = require("./contacts");
 const serviceTypeRouter = require("./serviceTypes");
 const eventRouter = require("./events");
 const menuRouter = require("./menus");
@@ -21,6 +22,7 @@ function route(app) {
   app.use("/events", eventRouter);
   app.use("/news", newsRouter);
   app.use("/services", servicesRouter);
+  app.use("/contacts", contactRouter);
   app.use("/packages", packageRouter);
   app.use("/promotions", promotionRouter);
   app.use("/staff", staffRouter);
