@@ -6,7 +6,6 @@ const customerSchema = new mongoose.Schema(
     email: { type: String, required: true, maxLength: 255, unique: true },
     phone: { type: String, maxLength: 20 },
     address: { type: String },
-    notes: { type: String },
   },
   {
     timestamps: true,

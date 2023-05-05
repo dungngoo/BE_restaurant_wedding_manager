@@ -18,7 +18,6 @@ const serviceTypeSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-  type: String,
 });
 
 const ServiceType = mongoose.model("ServiceType", serviceTypeSchema);

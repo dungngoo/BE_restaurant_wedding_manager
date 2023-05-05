@@ -2,7 +2,7 @@ const { nanoid } = require("nanoid");
 const sharp = require("sharp");
 
 const Staff = require("../models/Staff");
-const uploadFileToS3 = require("../middleware/uploadImage");
+const uploadFileToS3 = require("../middlewares/uploadImage");
 class StaffController {
   // [GET] /staff ( get all the staff members)
   get(req, res, next) {

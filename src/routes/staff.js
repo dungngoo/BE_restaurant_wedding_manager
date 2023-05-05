@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const staffController = require("../app/controllers/StaffController");
-const { upload } = require("../app/middleware/uploadImage");
+const { upload } = require("../app/middlewares/uploadImage");
 
 /**
  * @swagger
