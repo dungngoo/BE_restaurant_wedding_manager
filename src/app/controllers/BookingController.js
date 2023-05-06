@@ -24,6 +24,7 @@ class BookingController {
   }
   // [POST] /Booking
   createBooking = async (req, res) => {
+    const formData = req.body;
     const {
       name,
       phone,
@@ -34,7 +35,7 @@ class BookingController {
       decoration,
       lobbyType,
       numbersTable,
-    } = req.body;
+    } = formData;
 
     const newBooking = new Booking({
       name,
@@ -62,18 +63,18 @@ class BookingController {
 
   async sendEmail(req, res, next) {
     const formData = req.body;
+
     const {
       name,
       phone,
       eventDate,
       eventType,
       servicePackage,
-      menuType,
-      decoration,
       lobbyType,
       numbersTable,
       capacity,
     } = formData;
+    console.log(formData);
     // Kiểm tra xem có email nào trùng nội dung và cách đây không quá 24 giờ hay không
     const content = `
     <p>Tên khách hàng: ${name}</p>
@@ -86,7 +87,9 @@ class BookingController {
     <p>Sức chứa: ${capacity}</p>
   `;
     const duplicateEmail = sentEmails.find((email1) => {
-      const isDuplicate = sentEmails.find((email2) => email2.content === content);
+      const isDuplicate = sentEmails.find(
+        (email2) => email2.content === content
+      );
       const sentAt = new Date(email1.sentAt);
       const sentWithin24Hours = Date.now() - sentAt < 24 * 60 * 60 * 1000;
       return isDuplicate && sentWithin24Hours;
@@ -125,8 +128,6 @@ class BookingController {
         <p>Ngày tổ chức sự kiện: ${eventDate}</p>
         <p>Loại sự kiện: ${eventType}</p>
         <p>Gói dịch vụ: ${servicePackage}</p>
-        <p>Loại menu: ${menuType}</p>
-        <p>Trang trí: ${decoration}</p>
         <p>Loại phòng đón tiếp: ${lobbyType}</p>
         <p>Số lượng bàn: ${numbersTable}</p>
         <p>Sức chứa: ${capacity}</p>
@@ -136,10 +137,11 @@ class BookingController {
       // Gửi email
       const info = await transporter.sendMail(mailOptions);
       const newEmail = { content, sentAt: new Date() };
-      sentEmails.push(newEmail);
+      sentEmails.push(newEmail)
       const jsonData = JSON.stringify(sentEmails);
       fs.writeFileSync("D:\\QuanLyNhaHangTiecCuoi\\sentEmails.json", jsonData);
       console.log("Email sent: " + info.response);
+      res.status(200).send('Đặt tiệc thành công')
     } catch (err) {
       console.error(err);
     }
