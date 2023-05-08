@@ -3,26 +3,24 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const bookingSchema = new Schema({
-  lobbyId: { type: Schema.Types.ObjectId, ref: "Lobby" },
-  menuItems: [
-    {
-      menuItem: { type: Schema.Types.ObjectId, ref: "MenuItem" },
-      quantity: Number,
-    },
-  ],
+  lobbyId: { type: Schema.Types.ObjectId, ref: "Lobby", required: true },
+  customerId: { type: Schema.Types.ObjectId, ref: "Contact", require: true },
+  menuId: {
+    type: Schema.Types.ObjectId,
+    ref: "Menu",
+    require: true,
+  },
   services: [
     {
       service: { type: Schema.Types.ObjectId, ref: "Service" },
-      quantity: Number,
     },
   ],
+  serviceTypeId: {
+    type: Schema.Types.ObjectId,
+    ref: "ServiceType",
+    required: true,
+  },
   eventDate: Date,
-  startTime: Date,
-  endTime: Date,
-  customerName: String,
-  customerEmail: String,
-  customerPhone: String,
-  specialRequests: String,
   status: {
     type: String,
     enum: ["pending", "paid"],

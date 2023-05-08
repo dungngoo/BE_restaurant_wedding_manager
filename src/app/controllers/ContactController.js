@@ -7,10 +7,10 @@ class ContactController {
       .then((Contacts) => res.json(Contacts))
       .catch(next);
   }
-  //  Nhận nội dung email từ phía khách hàng và gửi cho email CSKH_DHPalace@gmail.com
+  //  Nhận nội dung phản hôi từ phía khách hàng và lưu vào cơ sở dữ liệu, đồng thời gửi email cám ơn về phía khách hàng
   async sendEmail(req, res, next) {
     const formData = req.body;
-    const { email, phone, title, text } = formData;
+    const { name, email, phone, text } = formData;
 
     // Create a transporter object to send email
     let transporter = nodemailer.createTransport({
@@ -18,7 +18,7 @@ class ContactController {
       port: 587,
       secure: false,
       auth: {
-        user: "ngodung06vn@gmail.com", // Your email address
+        user: "cskhdhpalace@gmail.com", // Your email address
         pass: "gwcfaegjikjvxrrr", // Your email password
       },
       tls: {
@@ -29,15 +29,33 @@ class ContactController {
     try {
       // Send email
       await transporter.sendMail({
-        from: "ngodung06vn@gmail.com", // Your name and email address
-        to: "cskhdhpalace@gmail.com", // Recipient's email address
-        subject: title, // Subject of the email
-        html: `<p>Email: ${email}</p>
-        <p>Số điện thoại: ${phone}</p>
-        Nội dung phản hồi:<span>${text}</span>`, // Email content with the form data
+        from: "Bộ phận chăm sóc khách hàng nhà hàng tiệc cưới DH PALACE - cskhdhpalace@gmail.com", // Your name and email address
+        to: `${email}`, // Recipient's email address
+        subject: "Cám ơn bạn đã liên hệ với nhà hàng chúng tôi", // Subject of the email
+        html: `<p>Cám ơn bạn đã đóng góp ý kiến về phía nhà hàng chúng tôi, chúng tôi sẽ cố gắng phản hồi cho bạn trong thời gian sớm nhất có thể</p>`,
       });
-      console.log("Đã gửi email thành công");
-      res.status(200).send({ message: "Email sent successfully" });
+      const contact = await Contact.findOne({ email: email });
+      if (contact) {
+        contact.notes.push(text);
+        contact.phone.push(phone);
+        await contact.save();
+        console.log(
+          "Thông tin liên hệ đã được cập nhật thành công trong cơ sở dữ liệu"
+        );
+      } else {
+        const newContact = new Contact({
+          name,
+          email,
+          phone: [phone],
+          notes: [text],
+        });
+
+        await newContact.save();
+        console.log(
+          "Thông tin liên hệ đã được lưu thành công vào cơ sở dữ liệu"
+        );
+      }
+      res.status(200).send({ message: "Liên hệ thành công" });
     } catch (error) {
       next(error);
     }

@@ -25,7 +25,6 @@ const serviceSchema = new Schema({
   },
   param: {
     type: String,
-    required: true,
   },
 });
 

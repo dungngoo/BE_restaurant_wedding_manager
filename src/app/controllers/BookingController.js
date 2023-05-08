@@ -1,4 +1,9 @@
 const Booking = require("../models/Booking");
+const Contact = require("../models/Contact");
+const ServiceType = require("../models/ServiceType");
+const Menu = require("../models/Menu");
+const Service = require("../models/Service");
+const Lobby = require("../models/Lobby");
 const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path");
@@ -22,90 +27,80 @@ class BookingController {
       .then((booking) => res.json(booking))
       .catch(next);
   }
+
   // [POST] /Booking
-  createBooking = async (req, res) => {
+  async createBooking(req, res, next) {
     const formData = req.body;
     const {
       name,
       phone,
+      email,
       eventDate,
+      menu,
       eventType,
-      servicePackage,
-      menuType,
-      decoration,
       lobbyType,
       numbersTable,
+      servicePackage,
     } = formData;
 
-    const newBooking = new Booking({
-      name,
-      phone,
-      event_date: eventDate,
-      event_type: eventType,
-      service_package: servicePackage,
-      menu_type: menuType,
-      decoration,
-      lobby_type: lobbyType,
-      number_table: numbersTable,
-      status: "pending",
-    });
+    try {
+      const menu1 = await Menu.findOne({ name: menu });
+      const menuId = menu1._id;
 
-    newBooking
-      .save()
-      .then(() => {
-        res.status(200).json({ message: "Booking created successfully" });
-      })
-      .catch((error) => {
-        res.status(500).json({ error: error.message });
+      const serviceType = await ServiceType.findOne({ type: eventType });
+      const serviceTypeId = serviceType._id;
+
+      const lobby = await Lobby.findOne({ name: lobbyType });
+      const lobbyId = lobby._id;
+
+      const existingContact = await Contact.findOne({ email: email });
+
+      let customerId;
+
+      if (existingContact) {
+        customerId = existingContact._id;
+        existingContact.phone.push(phone);
+        await existingContact.save();
+      } else {
+        const newContact = new Contact({
+          email: email,
+          name: name,
+          phone: [phone],
+        });
+
+        const savedContact = await newContact.save();
+        customerId = savedContact._id;
+      }
+
+      const services = await Service.find({
+        serviceName: { $in: servicePackage },
       });
-  };
-  // Gửi email cho admin sau khi khách hàng đặt tiệc
+
+      const newBooking = new Booking({
+        lobbyId: lobbyId,
+        customerId: customerId,
+        menuId: menuId,
+        serviceTypeId: serviceTypeId,
+        eventDate: eventDate,
+        services: services.map((service) => ({ service: service._id })),
+        tableQuantity: numbersTable,
+        status: "pending",
+      });
+
+      await newBooking.save();
+      res.status(200).json({ success: true });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Lỗi khi tạo đơn đặt tiệc" });
+    }
+  }
 
   async sendEmail(req, res, next) {
     const formData = req.body;
-
-    const {
-      name,
-      phone,
-      eventDate,
-      eventType,
-      servicePackage,
-      lobbyType,
-      numbersTable,
-      capacity,
-    } = formData;
-    console.log(formData);
-    // Kiểm tra xem có email nào trùng nội dung và cách đây không quá 24 giờ hay không
-    const content = `
-    <p>Tên khách hàng: ${name}</p>
-    <p>Số điện thoại: ${phone}</p>
-    <p>Ngày tổ chức sự kiện: ${eventDate}</p>
-    <p>Loại sự kiện: ${eventType}</p>
-    <p>Gói dịch vụ: ${servicePackage}</p>
-    <p>Loại phòng đón tiếp: ${lobbyType}</p>
-    <p>Số lượng bàn: ${numbersTable}</p>
-    <p>Sức chứa: ${capacity}</p>
-  `;
-    const duplicateEmail = sentEmails.find((email1) => {
-      const isDuplicate = sentEmails.find(
-        (email2) => email2.content === content
-      );
-      const sentAt = new Date(email1.sentAt);
-      const sentWithin24Hours = Date.now() - sentAt < 24 * 60 * 60 * 1000;
-      return isDuplicate && sentWithin24Hours;
-    });
-    if (duplicateEmail) {
-      console.log(
-        "Đã có email trùng lặp được gửi trong khoảng thời gian gần đây."
-      );
-      res
-        .status(500)
-        .send({ error: "Email đã được gửi với nội dung tương tụ" });
-      return;
-    }
+    const { email } = formData;
 
     try {
-      // Tạo một transporter để kết nối tới server email
+      // Tạo một transporter để kết nối tới server  email
       const transporter = nodemailer.createTransport({
         service: "Gmail",
         auth: {
@@ -120,30 +115,22 @@ class BookingController {
       // Cấu hình thông tin email
       const mailOptions = {
         from: "ngodung06vn@gmail.com",
-        to: "ngodung46vn@gmail.com",
-        subject: "Thông tin đăng ký đơn đặt tiệc",
+        to: `${email}`,
+        subject: "Cám ơn đã liên hệ với nhà hàng chúng tôi",
         html: `
-        <p>Tên khách hàng: ${name}</p>
-        <p>Số điện thoại: ${phone}</p>
-        <p>Ngày tổ chức sự kiện: ${eventDate}</p>
-        <p>Loại sự kiện: ${eventType}</p>
-        <p>Gói dịch vụ: ${servicePackage}</p>
-        <p>Loại phòng đón tiếp: ${lobbyType}</p>
-        <p>Số lượng bàn: ${numbersTable}</p>
-        <p>Sức chứa: ${capacity}</p>
-      `,
+          <p>Cám ơn bạn đã đặt tiệc tại nhà hàng chúng tôi. Bạn có thể đóng góp ý kiến cho chúng tôi qua trang liên hệ.</p>
+        `,
       };
 
       // Gửi email
       const info = await transporter.sendMail(mailOptions);
-      const newEmail = { content, sentAt: new Date() };
-      sentEmails.push(newEmail)
-      const jsonData = JSON.stringify(sentEmails);
-      fs.writeFileSync("D:\\QuanLyNhaHangTiecCuoi\\sentEmails.json", jsonData);
       console.log("Email sent: " + info.response);
-      res.status(200).send('Đặt tiệc thành công')
+      return res
+        .status(200)
+        .json({ success: true, message: "Đã gửi email thành công" });
     } catch (err) {
       console.error(err);
+      return res.status(500).json({ success: false, err: err.message });
     }
   }
 }

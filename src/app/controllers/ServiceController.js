@@ -27,7 +27,6 @@ class ServiceController {
         type: { $in: serviceTypeIds },
       })
         .populate("type")
-        .limit(4)
         .exec();
 
       res.json(services);

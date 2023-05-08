@@ -20,6 +20,19 @@ class ServiceTypeController {
       next(err);
     }
   }
+  // Lấy ra loại dịch vụ theo tên
+  async getServiceByName(req, res, next) {
+    const { name } = req.params;
+    console.log(name);
+    try {
+      const selectedServiceTypes = await ServiceType.find({
+        type: name,
+      });
+      res.json(selectedServiceTypes);
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = new ServiceTypeController();

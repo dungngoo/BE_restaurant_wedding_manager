@@ -7,16 +7,22 @@ const serviceTypeSchema = new Schema({
     required: true,
   },
   description: {
-    type: String,
+    type: [String],
     required: true,
   },
   isActive: {
     type: Boolean,
     default: true,
   },
+  imgs: {
+    type: [String],
+  },
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  type: {
+    type: String,
   },
 });
 
