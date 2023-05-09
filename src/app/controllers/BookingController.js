@@ -1,5 +1,5 @@
 const Booking = require("../models/Booking");
-const Contact = require("../models/Contact");
+const Customer = require("../models/Customer");
 const ServiceType = require("../models/ServiceType");
 const Menu = require("../models/Menu");
 const Service = require("../models/Service");
@@ -53,23 +53,23 @@ class BookingController {
       const lobby = await Lobby.findOne({ name: lobbyType });
       const lobbyId = lobby._id;
 
-      const existingContact = await Contact.findOne({ email: email });
+      const existingCustomer = await Customer.findOne({ email: email });
 
       let customerId;
 
-      if (existingContact) {
-        customerId = existingContact._id;
-        existingContact.phone.push(phone);
-        await existingContact.save();
+      if (existingCustomer) {
+        customerId = existingCustomer._id;
+        existingCustomer.phone.push(phone);
+        await existingCustomer.save();
       } else {
-        const newContact = new Contact({
+        const newCustomer = new Customer({
           email: email,
           name: name,
           phone: [phone],
         });
 
-        const savedContact = await newContact.save();
-        customerId = savedContact._id;
+        const savedCustomer = await newCustomer.save();
+        customerId = savedCustomer._id;
       }
 
       const services = await Service.find({

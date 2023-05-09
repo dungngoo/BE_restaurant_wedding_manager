@@ -1,10 +1,10 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-const customerController = require('../app/controllers/CustomerController');
+const customerController = require("../app/controllers/CustomerController");
 
 // customerController.index
-
-router.use('/', customerController.index);
+router.use("/sendEmail", customerController.sendEmail);
+router.use("/", customerController.getAll);
 
 module.exports = router;

@@ -24,9 +24,9 @@ class ServiceController {
 
       // Tìm tất cả các Service có type trùng với các _id của các ServiceType này
       const services = await Service.find({
-        type: { $in: serviceTypeIds },
+        serviceTypeId: { $in: serviceTypeIds },
       })
-        .populate("type")
+        .populate("serviceTypeId")
         .exec();
 
       res.json(services);

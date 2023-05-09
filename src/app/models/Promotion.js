@@ -7,7 +7,7 @@ const promotionSchema = new mongoose.Schema(
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
     image: { type: String, required: true },
-    serviceType: {
+    serviceTypeId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "ServiceType",
       required: true,

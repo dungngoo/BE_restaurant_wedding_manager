@@ -6,11 +6,13 @@ const serviceSchema = new Schema({
     type: String,
     required: true,
   },
-  type: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "ServiceType",
-    required: true,
-  },
+  serviceTypeId: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ServiceType",
+      required: true,
+    },
+  ],
   description: {
     type: [String],
     required: true,

@@ -19,18 +19,10 @@ const eventSchema = new Schema(
       type: Number,
       required: true,
     },
-    menuItems: [
-      {
-        menuItem: {
-          type: Schema.Types.ObjectId,
-          ref: "MenuItem",
-        },
-        quantity: {
-          type: Number,
-          required: true,
-        },
-      },
-    ],
+    menuId: {
+      type: Schema.Types.ObjectId,
+      ref: "Menu",
+    },
     services: [
       {
         service: {
@@ -39,23 +31,20 @@ const eventSchema = new Schema(
         },
       },
     ],
-    lobby: {
+    lobbyId: {
       type: Schema.Types.ObjectId,
       ref: "Lobby",
       required: true,
     },
-    decorationPackage: {
+    decorationPackageId: {
       type: Schema.Types.ObjectId,
       ref: "DecorationPackage",
       required: true,
     },
-    customer: {
+    customerId: {
       type: Schema.Types.ObjectId,
       ref: "Customer",
       required: true,
-    },
-    notes: {
-      type: String,
     },
   },
   { timestamps: true }

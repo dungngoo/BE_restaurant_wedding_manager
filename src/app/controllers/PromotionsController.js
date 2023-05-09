@@ -43,7 +43,7 @@ class PromotionsController {
       const promotions = await Promotion.find({
         serviceType: { $in: serviceIds },
       })
-        .populate("serviceType")
+        .populate("serviceTypeId")
         .limit(4)
         .exec();
 
