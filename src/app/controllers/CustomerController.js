@@ -19,7 +19,7 @@ class CustomerController {
       secure: false,
       auth: {
         user: "cskhdhpalace@gmail.com", // Your email address
-        pass: "gwcfaegjikjvxrrr", // Your email password
+        pass: `${process.env.VSCODE_PW_GOOGLE}`, // Your email password
       },
       tls: {
         rejectUnauthorized: false,
