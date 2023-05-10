@@ -7,11 +7,8 @@ const Lobby = require("../models/Lobby");
 const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path");
-
-const sentEmailsFile = path.join(
-  "D:\\QuanLyNhaHangTiecCuoi\\",
-  "sentEmails.json"
-);
+const filePath = path.join(__dirname, "..", "jsons");
+const sentEmailsFile = path.join(filePath, "sentEmails.json");
 let sentEmails = [];
 
 try {
@@ -97,8 +94,50 @@ class BookingController {
 
   async sendEmail(req, res, next) {
     const formData = req.body;
-    const { email } = formData;
+    const {
+      name,
+      phone,
+      email,
+      eventDate,
+      menu,
+      eventType,
+      lobbyType,
+      numbersTable,
+      servicePackage,
+    } = formData;
+    // Kiểm tra nếu đơn mới trùng với các trường dữ liệu trong file sentEmails.json
+    const isDuplicate = sentEmails.find((sentEmail) => {
+      return (
+        sentEmail.name === name &&
+        sentEmail.email === email &&
+        sentEmail.phone === phone &&
+        sentEmail.eventDate === eventDate &&
+        sentEmail.menu === menu &&
+        sentEmail.eventType === eventType &&
+        sentEmail.lobbyType === lobbyType &&
+        sentEmail.numbersTable === numbersTable &&
+        JSON.stringify(sentEmail.servicePackage) ===
+          JSON.stringify(servicePackage)
+      );
+    });
+    if (isDuplicate) {
+      console.log("Thông tin đặt tiệc bị trùng");
+      return res.status(400).json({
+        success: false,
+        message: "Email đã được gửi với nội dung tương tự",
+      });
+    }
+    const isDuplicateEmail = sentEmails.find((sentEmail) => {
+      return sentEmail.email === email;
+    });
 
+    if (isDuplicateEmail) {
+      console.log("Email bị trùng");
+      return res.status(400).json({
+        success: false,
+        message: "Email này đã có người khác sử dụng",
+      });
+    }
     try {
       // Tạo một transporter để kết nối tới server  email
       const transporter = nodemailer.createTransport({
@@ -125,6 +164,11 @@ class BookingController {
       // Gửi email
       const info = await transporter.sendMail(mailOptions);
       console.log("Email sent: " + info.response);
+
+      // Thêm đơn mới vào mảng sentEmails và ghi vào file sentEmails.json
+      sentEmails.push(formData);
+      fs.writeFileSync(sentEmailsFile, JSON.stringify(sentEmails));
+
       return res
         .status(200)
         .json({ success: true, message: "Đã gửi email thành công" });
