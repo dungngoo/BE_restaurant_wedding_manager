@@ -1,8 +1,19 @@
 const { nanoid } = require("nanoid");
 const sharp = require("sharp");
-
+const express = require("express");
+const multer = require("multer");
+const fs = require("fs");
+const aws = require("aws-sdk");
+const multerS3 = require("multer-s3");
 const Staff = require("../models/Staff");
-const uploadFileToS3 = require("../middlewares/uploadImage");
+const { uploadFile } = require("../middlewares/s3");
+
+// Khởi tạo AWS SDK
+const s3 = new aws.S3({
+  accessKeyId: "YOUR_ACCESS_KEY_ID",
+  secretAccessKey: "YOUR_SECRET_ACCESS_KEY",
+  region: "YOUR_AWS_REGION",
+});
 class StaffController {
   // [GET] /staff ( get all the staff members)
   get(req, res, next) {
@@ -24,46 +35,33 @@ class StaffController {
 
   //   [POST] /staff
   async create(req, res) {
-    // uploadFileToS3(req.body.pathFile, req.file, function (err, url) {
-    //   if (err) {
-    //     console.log("Error uploading file: ", err);
-    //     return res.status(400).send({ message: "Error uploading file." });
-    //   } else {
-    //     console.log("File uploaded successfully. URL: ", url);
-    //     const staff = new Staff({
-    //       staff_id: `#NV${nanoid(4)}`,
-    //       ...req.body,
-    //       staffImg: url,
-    //     });
-    //     staff.save(function (err, staff) {
-    //       if (err) {
-    //         return res
-    //           .status(400)
-    //           .send({ message: "Cann't create a staff", err: err.keyValue });
-    //       }
-    //       return res.status(200).send({
-    //         message: "Created staff successfully",
-    //         staff: staff,
-    //       });
-    //     });
-    //   }
-    // });
+    if (!req.file) {
+      return res.status(400).send({ message: "Missing staff image" });
+    }
+
     try {
-      console.log(req.file);
-      let imagePath = req.file.path;
+      // Upload file to S3
+      const fileLocation = await uploadFile(req.file);
+      console.log(fileLocation);
       const staff = new Staff({
         staff_id: `#NV${nanoid(4)}`,
         ...req.body,
-        staffImg: imagePath,
+        staffImg: fileLocation.Key,
       });
-      await staff.save();
-      return res
-        .status(200)
-        .send({ message: "Created staff successfully", staff: staff });
+
+      staff.save(function (err, staff) {
+        if (err) {
+          return res
+            .status(400)
+            .send({ message: "Can't create a staff", err: err.keyValue });
+        }
+        return res
+          .status(200)
+          .send({ message: "Created staff successfully", staff: staff });
+      });
     } catch (err) {
-      return res
-        .status(400)
-        .send({ message: "Cann't create a staff", err: err.keyValue });
+      console.error(err);
+      res.status(500).send("Error processing file");
     }
   }
 

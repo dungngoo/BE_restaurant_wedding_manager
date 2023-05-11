@@ -1,9 +1,8 @@
 const express = require("express");
 const router = express.Router();
-
-const staffController = require("../app/controllers/StaffController");
-const { upload } = require("../app/middlewares/uploadImage");
-
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
+const staffController = require("../app/controllers/staffController");
 /**
  * @swagger
  * components:
@@ -103,11 +102,7 @@ const { upload } = require("../app/middlewares/uploadImage");
  */
 
 // staffController.create
-router.post(
-  "/",
-  upload.single("staffImg"),
-  staffController.create
-);
+router.post("/", upload.single("staffImg"), staffController.create);
 
 /**
  * @swagger
