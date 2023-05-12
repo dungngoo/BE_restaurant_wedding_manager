@@ -4,7 +4,9 @@ const ServiceType = require("../models/ServiceType");
 const Menu = require("../models/Menu");
 const Service = require("../models/Service");
 const Lobby = require("../models/Lobby");
+const Party = require("../models/Party");
 const nodemailer = require("nodemailer");
+const cron = require("node-cron");
 const fs = require("fs");
 const path = require("path");
 const filePath = path.join(__dirname, "..", "jsons");
@@ -18,12 +20,80 @@ try {
   console.error(err);
 }
 class BookingController {
-  // [GET] /Booking
-  index(req, res, next) {
+  // Lấy tất cả các bookings và giới hạn chỉ lấy 10 cái mỗi trang
+  getAll(req, res, next) {
+    const { limit, page } = req.query;
+    console.log(limit);
+    console.log(page);
     Booking.find({})
-      .then((booking) => res.json(booking))
-      .catch(next);
+      .populate("customerId")
+      .populate("lobbyId")
+      .populate("services")
+      .populate("serviceTypeId")
+      .populate("menuId")
+      .limit(limit)
+      .skip(limit * (page - 1))
+      .then((bookings) => {
+        res.send(bookings);
+      })
+      .catch((err) => console.error(err.message));
   }
+
+  async deletePending(req, res, next) {
+    const cutoffDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // Lấy thời gian 1 ngày trước// Lấy thời gian 7 ngày trước đó tính tới thời điểm hiện tại
+    try {
+      const result = await Booking.deleteMany({
+        status: "pending",
+        createdAt: { $lt: cutoffDate },
+      });
+      console.log(
+        `Đã xóa ${result.deletedCount} đơn đặt tiệc chưa thanh toán trước thời gian hiện tại`
+      );
+      res.send({
+        message: `Đã xóa ${result.deletedCount} đơn đặt tiệc chưa thanh toán trước thời gian hiện tại`,
+      }); // Thêm dòng này để trả về response cho client
+    } catch (err) {
+      console.error("Lỗi khi xóa booking chưa được xác nhận", err);
+      next();
+    }
+  }
+
+  // Cập nhật trạng thái booking từ pending thành paid
+  updateBookingStatus = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+      const booking = await Booking.findOneAndUpdate(
+        { _id: id, status: "pending" },
+        { status: "paid", updatedAt: new Date() },
+        { new: true }
+      );
+      if (!booking) {
+        throw new Error("Booking not found or already paid");
+      }
+      console.log(`Booking ${booking._id} is now paid`);
+      if (booking.status === "paid") {
+        // Tạo đối tượng Event từ thông tin của booking
+        const party = new Party({
+          eventDate: booking.eventDate,
+          // startTime: booking.startTime,
+          // endTime: booking.endTime,
+          tableQuantity: booking.tableQuantity,
+          menuId: booking.menuId,
+          services: booking.services,
+          serviceTypeId: booking.serviceTypeId,
+          lobbyId: booking.lobbyId,
+          customerId: booking.customerId,
+        });
+        // Lưu đối tượng Event vào CSDL bằng cách sử dụng hàm create trong Mongoose
+        party.save();
+        console.log("Event created from booking:", party);
+        res.status(200).json({ message: "Booking status updated" });
+      }
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).json({ error: "Server error" });
+    }
+  };
 
   // [POST] /Booking
   async createBooking(req, res, next) {
@@ -143,8 +213,8 @@ class BookingController {
       const transporter = nodemailer.createTransport({
         service: "Gmail",
         auth: {
-          user: "ngodung06vn@gmail.com",
-          pass: "gwcfaegjikjvxrrr",
+          user: "cskhdhpalace@gmail.com",
+          pass: `${process.env.VSCODE_PW_GOOGLE}`,
         },
         tls: {
           rejectUnauthorized: false,
@@ -153,7 +223,7 @@ class BookingController {
 
       // Cấu hình thông tin email
       const mailOptions = {
-        from: "ngodung06vn@gmail.com",
+        from: "Bộ phận chăm sóc khách hàng nhà hàng tiệc cưới DH PALACE - cskhdhpalace@gmail.com", // Your name and email address,
         to: `${email}`,
         subject: "Cám ơn đã liên hệ với nhà hàng chúng tôi",
         html: `

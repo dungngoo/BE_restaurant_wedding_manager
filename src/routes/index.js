@@ -2,6 +2,7 @@ const customerRouter = require("./customer");
 const bookingRouter = require("./bookings");
 const lobbiesRouter = require("./lobbies");
 const servicesRouter = require("./services");
+const partyRouter = require("./parties");
 const packageRouter = require("./packages");
 const menuitemRouter = require("./menuitems");
 const serviceTypeRouter = require("./serviceTypes");
@@ -17,6 +18,7 @@ function route(app) {
   app.use("/bookings", bookingRouter);
   app.use("/menuitems", menuitemRouter);
   app.use("/admin", adminRouter);
+  app.use("/parties", partyRouter);
   app.use("/serviceTypes", serviceTypeRouter);
   app.use("/menus", menuRouter);
   app.use("/lobbies", lobbiesRouter);

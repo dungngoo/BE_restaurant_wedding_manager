@@ -3,7 +3,11 @@ const MenuItem = require("../models/MenuItem");
 class MenuController {
   // Lấy tất cả thực đơn
   getAll(req, res, next) {
+    const { limit, page } = req.query;
     Menu.find({})
+      .populate("items")
+      .limit(limit)
+      .skip(limit * (page - 1))
       .then((menu) => res.json(menu))
       .catch(next);
   }

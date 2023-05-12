@@ -4,7 +4,11 @@ const ServiceType = require("../models/ServiceType");
 class ServiceController {
   // Lấy tất cả Services
   getAll(req, res, next) {
+    const { limit, page } = req.query;
     Service.find({})
+      .populate("serviceTypeId")
+      .skip(limit * (page - 1))
+      .limit(limit)
       .then((service) => res.json(service))
       .catch(next);
   }

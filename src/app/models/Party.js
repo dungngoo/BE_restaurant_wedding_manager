@@ -9,11 +9,9 @@ const eventSchema = new Schema(
     },
     startTime: {
       type: Date,
-      required: true,
     },
     endTime: {
       type: Date,
-      required: true,
     },
     tableQuantity: {
       type: Number,
@@ -22,6 +20,11 @@ const eventSchema = new Schema(
     menuId: {
       type: Schema.Types.ObjectId,
       ref: "Menu",
+    },
+    serviceTypeId: {
+      type: Schema.Types.ObjectId,
+      ref: "ServiceType",
+      required: true,
     },
     services: [
       {
@@ -36,18 +39,13 @@ const eventSchema = new Schema(
       ref: "Lobby",
       required: true,
     },
-    decorationPackageId: {
-      type: Schema.Types.ObjectId,
-      ref: "DecorationPackage",
-      required: true,
-    },
     customerId: {
       type: Schema.Types.ObjectId,
-      ref: "Customer",
+      ref: "Contact",
       required: true,
     },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Event", eventSchema);
+module.exports = mongoose.model("Party", eventSchema);

@@ -17,7 +17,10 @@ const s3 = new aws.S3({
 class StaffController {
   // [GET] /staff ( get all the staff members)
   get(req, res, next) {
+    const { limit, page } = req.query;
     Staff.find({})
+      .limit(limit)
+      .skip(limit * (page - 1))
       .then((staff) => res.send(staff))
       .catch(next);
   }
