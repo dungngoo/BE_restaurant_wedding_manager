@@ -6,12 +6,12 @@ const ContactSchema = new mongoose.Schema({
     required: true,
   },
   phone: {
-    type: [String],
+    type: String,
+    required: true,
   },
   email: {
     type: String,
     required: true,
-    unique: true,
   },
   notes: {
     type: [String],
@@ -22,6 +22,4 @@ const ContactSchema = new mongoose.Schema({
   },
 });
 
-const Contact = mongoose.model("Contact", ContactSchema);
-
-module.exports = Contact;
+module.exports = mongoose.model("Contact", ContactSchema);

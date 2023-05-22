@@ -6,7 +6,7 @@ const fs = require("fs");
 const aws = require("aws-sdk");
 const multerS3 = require("multer-s3");
 const Staff = require("../models/Staff");
-const { uploadFile } = require("../middlewares/s3");
+const { uploadFile, updateFile, deleteFile } = require("../middlewares/s3");
 
 // Khởi tạo AWS SDK
 const s3 = new aws.S3({
@@ -62,6 +62,12 @@ class StaffController {
           .status(200)
           .send({ message: "Created staff successfully", staff: staff });
       });
+      // Xóa tệp tin tạm trên máy chủ
+      fs.unlink(req.file.path, (err) => {
+        if (err) {
+          console.log(err);
+        }
+      });
     } catch (err) {
       console.error(err);
       res.status(500).send("Error processing file");
@@ -73,54 +79,91 @@ class StaffController {
     // set date undefined-undefined-yyyy-month-day to dd/mm/yyyy
     function changeFormat(val) {
       const myArr = val.split("-");
-
       let year = myArr[2];
       let month = myArr[3];
       let day = myArr[4];
-
       let formatDate = day + "/" + month + "/" + year;
       return formatDate;
     }
-    console.log(req.body);
     const id = req.params.id;
     const updatedStaff = req.body;
     const birth = changeFormat(req.body.birth);
     const date = changeFormat(req.body.date);
-    // Tìm nhân viên theo staff_id và cập nhật thông tin
-    Staff.findOneAndUpdate(
-      { _id: id },
-      { $set: updatedStaff, birth, date },
-      { new: true },
-      (err, result) => {
-        if (err) {
-          console.error(err);
-          res.status(500).json({ error: "Internal server error" });
-        } else {
-          res.status(200).json({ message: "Update successful" });
-          console.log(result);
+
+    try {
+      // Kiểm tra nếu có hình ảnh mới được tải lên
+
+      if (req.file) {
+        console.log(updatedStaff.oldStaffImg);
+        if (updatedStaff.oldStaffImg) {
+          await deleteFile(updatedStaff.oldStaffImg);
         }
+        const fileKey = `staff-images/${id}-${req.file.originalname}-${req.file.filename}`;
+        const newFilePath = req.file.path;
+
+        // Cập nhật hình ảnh trên S3
+        await updateFile(fileKey, newFilePath);
+
+        // Xóa tệp tạm trên máy chủ
+        fs.unlinkSync(newFilePath);
+
+        // Lưu khóa hình ảnh cập nhật trong req.body
+        updatedStaff.staffImg = fileKey;
+      } else {
+        return res.status(400).send({ message: "Missing staff image" });
       }
-    );
+      // Cập nhật thông tin nhân viên trong CSDL
+      Staff.findOneAndUpdate(
+        { _id: id },
+        { $set: updatedStaff, birth, date },
+        { new: true },
+        (err, result) => {
+          if (err) {
+            console.error(err);
+            res.status(500).json({ error: "Internal server error" });
+          } else {
+            res.status(200).json({ message: "Update successful" });
+            console.log(result);
+          }
+        }
+      );
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Error updating staff" });
+    }
   }
 
   // [DELETE] /staff/:id
   async delete(req, res) {
     const id = req.params.id;
-    Staff.deleteOne(
-      {
-        _id: id,
-      },
-      (err, result) => {
+    Staff.findById(id, (err, staff) => {
+      if (err || !staff) {
+        console.log(err);
+        return res
+          .status(404)
+          .json({ message: "Không tìm thấy tài liệu nhân viên" });
+      }
+
+      // Lấy staffImg từ nhân viên tìm thấy
+      const staffImg = staff.staffImg;
+
+      // Tiến hành xóa nhân viên
+      Staff.deleteOne({ _id: id }, (err, result) => {
         if (err || !result.deletedCount) {
           console.log(err);
           return res
             .status(404)
             .json({ message: "Không tìm thấy tài liệu nhân viên" });
         } else {
+          // Xóa hình ảnh nhân viên trên S3
+          if (staffImg) {
+            deleteFile(staffImg);
+          }
+
           res.status(200).json({ message: "Đã xóa tài liệu nhân viên" });
         }
-      }
-    );
+      });
+    });
   }
   // [DELETE] MANY /staff/ --- Xóa tất cả những nhân viên trong bản nhân viên
   async deleteMany(req, res) {

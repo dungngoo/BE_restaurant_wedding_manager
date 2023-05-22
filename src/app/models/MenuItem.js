@@ -24,7 +24,7 @@ const menuItemSchema = new Schema({
     type: String,
     required: true,
   },
-  category: {
+  type: {
     type: String,
     required: true,
   },
@@ -39,10 +39,6 @@ const menuItemSchema = new Schema({
   updatedAt: {
     type: Date,
     default: Date.now,
-  },
-  type: {
-    type: String,
-    required: true,
   },
 });
 

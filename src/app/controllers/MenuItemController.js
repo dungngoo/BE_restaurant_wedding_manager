@@ -8,22 +8,81 @@ class MenuItemController {
       .catch(next);
   }
   //   Lấy món ăn theo loại
-  getMenuItemByType(req, res, next) {
-    console.log(req.params.type);
-    MenuItem.find({ type: req.params.type })
-      .then((menuItem) => res.json(menuItem))
-      .catch(next);
+
+  async getMenuItemByType(req, res, next) {
+    const { type } = req.params;
+    try {
+      const { _page, _limit } = req.query;
+      console.log(_page);
+      console.log(_limit);
+      console.log(type);
+      const startIndex = (_page - 1) * _limit;
+      const endIndex = startIndex + parseInt(_limit);
+      console.log(req.params.type);
+      const totalCategories = await MenuItem.countDocuments({
+        type: type,
+      });
+      const totalPages = Math.ceil(totalCategories / _limit);
+
+      const currentMenuItem = await MenuItem.find({ type: req.params.type })
+        .skip(startIndex)
+        .limit(parseInt(_limit));
+
+      res.json({
+        data: currentMenuItem,
+        pagination: {
+          _page,
+          _limit,
+          _totalRows: totalCategories,
+          _totalPages: totalPages,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
+    }
   }
-  // Lấy món ăn theo 4 loại món chính, món phụ, món khai vị, món tráng miệng
-  async getMenuItemsByType(req, res) {
+  // Lấy món ăn theo category
+  async getMenuItemsByCategory(req, res) {
+    const { _page, _limit } = req.query;
+    const startIndex = (_page - 1) * _limit;
+    const endIndex = startIndex + parseInt(_limit);
+
     try {
       const menuitems = await MenuItem.aggregate([
         { $match: { available: true } }, // Lọc các món ăn có sẵn
-        { $group: { _id: "$type", items: { $push: "$$ROOT" } } }, // Nhóm các món theo loại
-        { $replaceRoot: { newRoot: { $arrayElemAt: ["$items", 0] } } }, // Lấy một món đầu tiên trong từng nhóm
-        { $sort: { type: 1 } }, // Sắp xếp theo thứ tự tăng dần của trường type// Lấy một món đầu tiên trong từng nhóm
+        { $group: { _id: "$type", items: { $push: "$$ROOT" } } }, // Nhóm các món theo category
+        { $sort: { _id: 1 } }, // Sắp xếp theo thứ tự tăng dần của trường category
       ]).exec();
-      res.send(menuitems);
+
+      const totalCategories = menuitems.length;
+      const totalPages = Math.ceil(totalCategories / _limit);
+      const currentCategories = menuitems.slice(startIndex, endIndex);
+
+      res.json({
+        data: currentCategories,
+        pagination: {
+          _page,
+          _limit,
+          _totalRows: totalCategories,
+          _totalPages: totalPages,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  }
+  async searchMenuCategories(req, res, next) {
+    const { search } = req.query;
+    console.log(search);
+    try {
+      const searchResults = await MenuItem.findOne({
+        type: { $regex: search, $options: "i" },
+      });
+
+      console.log("Kết quả tìm kiếm:", searchResults);
+      res.send(searchResults);
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Internal server error" });

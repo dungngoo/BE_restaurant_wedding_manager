@@ -13,11 +13,10 @@ const s3 = new aws.S3({
 });
 
 function uploadFile(file) {
-  console.log(file);
   const fileStream = fs.createReadStream(file.path);
   const uploadParams = {
     Bucket: "website-restaurant",
-    Key: `${file.fieldname}-${file.originalname}-${file.filename}`,
+    Key: `staff-images/${file.originalname}-${file.filename}`,
     Body: fileStream,
   };
   return s3.upload(uploadParams).promise();
@@ -33,4 +32,51 @@ function getFileStream(fileKey) {
 
   return s3.getObject(downloadParams).createReadStream();
 }
+
 exports.getFileStream = getFileStream;
+
+function updateFile(fileKey, newFilePath) {
+  return new Promise((resolve, reject) => {
+    if (!newFilePath) {
+      reject(new Error("File path is undefined"));
+      return;
+    }
+
+    const fileStream = fs.createReadStream(newFilePath);
+    const updateParams = {
+      Bucket: "website-restaurant",
+      Key: fileKey,
+      Body: fileStream,
+    };
+
+    const uploadOptions = {
+      partSize: 10 * 1024 * 1024, // 10MB part size
+      queueSize: 1, // Number of parallel uploads
+    };
+
+    const upload = s3.upload(updateParams, uploadOptions);
+
+    upload.on("httpUploadProgress", function (progress) {
+      // Handle progress events if needed
+    });
+
+    upload.send(function (err, data) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+}
+
+exports.updateFile = updateFile;
+function deleteFile(fileKey) {
+  const deleteParams = {
+    Bucket: "website-restaurant",
+    Key: fileKey,
+  };
+  return s3.deleteObject(deleteParams).promise();
+}
+
+exports.deleteFile = deleteFile;

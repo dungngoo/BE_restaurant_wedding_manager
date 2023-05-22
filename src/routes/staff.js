@@ -137,7 +137,7 @@ router.post("/", upload.single("staffImg"), staffController.create);
  */
 
 // staffController.update
-router.put("/:id", staffController.update);
+router.put("/:id", upload.single("staffImg"), staffController.update);
 
 /**
  * @swagger
