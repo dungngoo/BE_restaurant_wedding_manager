@@ -21,7 +21,7 @@
       "headers": {
         "Access-Control-Allow-Origin": "*"
       },
-      "dest": "/index.html"
+      "dest": "/index.js"
     }
   ]
 }
