@@ -1,5 +1,4 @@
 const express = require("express");
-// CORS
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
@@ -10,15 +9,6 @@ const upload = multer({ dest: "uploads/" });
 
 require("dotenv").config();
 
-// const booksRouter = require('./routes/books');
-// const FileSync = require("lowdb/adapters/FileSync");
-
-// const adapter = new FileSync("db.json");
-// const db = low(adapter);
-
-// db.defaults({ books: [] }).write();
-
-//  Cấu hình Swagger UI
 const options = {
   definition: {
     openapi: "3.0.0",
@@ -41,26 +31,22 @@ const app = express();
 
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 
-// app.db = db;
 const path = require("path");
 const port = 3001;
 
 const route = require("./routes");
 const db = require("./config/db");
 
-// Connect to DB
 db.connect();
 
-// CORS
 const corsOptions = {
   origin: "https://dhpalace-restaurant-cli.vercel.app",
 };
-app.use(cors(corsOptions));
 
+app.use(cors(corsOptions));
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static("uploads"));
 
-// Middleware get post for html
 app.use(
   bodyParser.urlencoded({
     extended: false,
@@ -68,12 +54,10 @@ app.use(
 );
 app.use(bodyParser.json());
 
-// HTTP logger
 app.use(morgan("combined"));
 
-// // Routes init
 route(app);
 
 app.listen(port, () => {
-  console.log(`Example app listening on por ${port}`);
+  console.log(`Example app listening on port ${port}`);
 });
