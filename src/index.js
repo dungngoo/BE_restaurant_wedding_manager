@@ -52,7 +52,10 @@ const db = require("./config/db");
 db.connect();
 
 // CORS
-app.use(cors());
+const corsOptions = {
+  origin: "https://dhpalace-restaurant-cli.vercel.app",
+};
+app.use(cors(corsOptions));
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static("uploads"));
