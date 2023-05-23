@@ -34,13 +34,16 @@ app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 const path = require("path");
 const port = 3001;
 
-const route = require("../routes");
-const db = require("../config/db");
+const route = require("./routes");
+const db = require("./config/db");
 
 db.connect();
 
 const corsOptions = {
-  origin: "https://dhpalace-restaurant-cli.vercel.app",
+  origin: [
+    "http://localhost:3001",
+    "https://dhpalace-restaurant-cli.vercel.app",
+  ],
 };
 
 app.use(cors(corsOptions));
