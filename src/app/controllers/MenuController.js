@@ -12,6 +12,7 @@ class MenuController {
       .catch(next);
   }
   // Lấy thực đơn theo loại món ăn
+  
   async getMainDishesMenu(req, res) {
     const { type } = req.params;
     try {

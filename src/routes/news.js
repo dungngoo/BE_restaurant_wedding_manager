@@ -2,141 +2,121 @@ const express = require("express");
 const router = express.Router();
 
 const newsController = require("../app/controllers/NewsController");
-
 /**
  * @swagger
  * components:
  *   schemas:
  *     News:
- *        type: object
- *        required:
- *           - title
- *           - content
- *        properties:
- *           news_id:
- *              type: string
- *              description: 'AB123'
- *           title:
- *              type: string
- *              description: The auto-ABC
- *           content:
- *              type: string
- *              description: Hello
- *           example:
- *              news_id: 'AB123'
- *              title: The New ABCDEF
- *              content: Hello World
+ *       type: object
+ *       required:
+ *         - title
+ *         - content
+ *         - image
+ *       properties:
+ *         news_id:
+ *           type: string
+ *           description: ID của tin tức
+ *         title:
+ *           type: string
+ *           description: Tiêu đề tin tức
+ *         content:
+ *           type: string
+ *           description: Nội dung tin tức
+ *         image:
+ *           type: string
+ *           description: Đường dẫn đến hình ảnh tin tức
  */
-
 /**
  * @swagger
  * /news/{id}:
  *   get:
- *     summary: Get the news by id
- *     tags: [News]
+ *     tags:
+ *       - News
+ *     summary: Lấy thông tin tin tức bằng ID
+ *     description: Lấy thông tin chi tiết của một tin tức dựa trên ID
  *     parameters:
- *       - in: path
- *         name: id
+ *       - name: id
+ *         in: path
+ *         description: ID của tin tức cần lấy thông tin
+ *         required: true
  *         schema:
  *           type: string
- *         required: true
- *         description: The news id
  *     responses:
- *       200:
- *         description: The news description by id
- *         contents:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/News'
- *       404:
- *         description: The book was not found
- */
-
-router.use("/:id", newsController.getById);
-/**
- * @swagger
- * tags:
- *  name: News
- *  description: The News managaning API
- */
-
-router.use("/", newsController.index);
-
-/**
- * @swagger
- * /news:
- *   post:
- *     summary: Create a new News
- *     tags: [News]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/News'
- *     responses:
- *       200:
- *         description: The News was successfully created
+ *       '200':
+ *         description: Thành công. Trả về thông tin chi tiết của tin tức.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/News'
- *       500:
- *         description: Some server error
+ *       '500':
+ *         description: Lỗi server. Không thể lấy thông tin tin tức.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Thông báo lỗi.
  */
-
+router.use("/:id", newsController.getById);
 /**
  * @swagger
- * /News/{id}:
- *  put:
- *    summary: Update the News by the id
- *    tags: [News]
- *    parameters:
- *      - in: path
- *        name: id
- *        schema:
- *          type: string
- *        required: true
- *        description: The News id
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            $ref: '#/components/schemas/News'
- *    responses:
- *      200:
- *        description: The News was updated
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/News'
- *      404:
- *        description: The News was not found
- *      500:
- *        description: Some error happened
- */
-
-/**
- * @swagger
- * /News/{id}:
- *   delete:
- *     summary: Remove the News by id
- *     tags: [News]
+ * /news:
+ *   get:
+ *     tags:
+ *       - News
+ *     summary: Lấy danh sách tin tức
+ *     description: Lấy danh sách tất cả các tin tức
  *     parameters:
- *       - in: path
- *         name: id
+ *       - name: _page
+ *         in: query
+ *         description: Số trang hiện tại
+ *         required: false
  *         schema:
- *           type: string
- *         required: true
- *         description: The News id
- *
+ *           type: integer
+ *       - name: _limit
+ *         in: query
+ *         description: Số lượng tin tức tối đa trên mỗi trang
+ *         required: false
+ *         schema:
+ *           type: integer
  *     responses:
- *       200:
- *         description: The News was deleted
- *       404:
- *         description: The News was not found
+ *       '200':
+ *         description: Thành công. Trả về danh sách tin tức.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/News'
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     _page:
+ *                       type: integer
+ *                       description: Số trang hiện tại
+ *                     _limit:
+ *                       type: integer
+ *                       description: Số lượng tin tức tối đa trên mỗi trang
+ *                     _totalRows:
+ *                       type: integer
+ *                       description: Tổng số tin tức
+ *       '500':
+ *         description: Lỗi server. Không thể lấy danh sách tin tức.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Thông báo lỗi.
  */
+router.use("/", newsController.index);
 router.get("/", (req, res) => {
   const news = req.app.db.get("news");
 

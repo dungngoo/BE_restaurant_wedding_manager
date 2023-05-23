@@ -8,220 +8,354 @@ const staffController = require("../app/controllers/staffController");
  * components:
  *   schemas:
  *     Staff:
- *        type: object
- *        required:
- *           - fullname
- *           - email
- *           - address
- *           - date
- *           - phonenumber
- *           - identify
- *           - sex
- *           - staff_id
- *           - birthPlace
- *           - dateOfPlace
- *           - staffImg
- *           - job_type
- *        properties:
- *           staff_id:
- *              type: string
- *              description: 'ID nhân viên'
- *           fullname:
- *              type: string
- *              description: 'Họ tên'
- *           staffImg:
- *              type: string
- *              description: 'Ảnh thẻ 3x4'
- *           email:
- *              type: string
- *              description: 'Email'
- *           address:
- *              type: string
- *              description: 'Địa chỉ'
- *           birth:
- *              type: string
- *              description: 'Ngày sinh'
- *           sex:
- *              type: string
- *              description: 'Giới tính'
- *           phonenumber:
- *              type: string
- *              description: 'Số điện thoại'
- *           job_type:
- *              type: string
- *              description: 'Chức vụ nghề nghiệp'
- *           birthPlace:
- *              type: string
- *              description: 'Nơi sinh'
- *           dateOfPlace:
- *              type: string
- *              description: 'Ngày cấp'
- *           identify:
- *              type: string
- *              description: 'Chứng minh nhân dân'
+ *       type: object
+ *       required:
+ *         - fullname
+ *         - email
+ *         - phonenumber
+ *       properties:
+ *         staff_id:
+ *           type: string
+ *           description: ID nhân viên
+ *         fullname:
+ *           type: string
+ *           maxLength: 60
+ *           description: Họ và tên nhân viên
+ *         email:
+ *           type: string
+ *           maxLength: 100
+ *           description: Địa chỉ email của nhân viên
+ *         address:
+ *           type: string
+ *           description: Địa chỉ nhân viên
+ *         birth:
+ *           type: string
+ *           description: Ngày sinh của nhân viên
+ *         birthPlace:
+ *           type: string
+ *           description: Nơi sinh của nhân viên
+ *         date:
+ *           type: string
+ *           description: Ngày tháng năm
+ *         dateOfPlace:
+ *           type: string
+ *           description: Địa chỉ nơi sinh
+ *         phonenumber:
+ *           type: string
+ *           description: Số điện thoại của nhân viên
+ *         identify:
+ *           type: string
+ *           maxLength: 25
+ *           description: Số CMND/CCCD của nhân viên
+ *         staffImg:
+ *           type: string
+ *           description: Đường dẫn ảnh đại diện của nhân viên
+ *         sex:
+ *           type: string
+ *           description: Giới tính của nhân viên
+ *         job_type:
+ *           type: string
+ *           description: Loại công việc của nhân viên
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: Ngày tạo
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           description: Ngày cập nhật
  */
-
-// example:
-//  *              staff_id: #NV1237
-//  *              fullname: 'Ngo Van Ten'
-//  *              staff_img:
-//  *              address: 349 Pham Van Sang
-//  *              birth: 04-10-2001
-//  *              sex: Nam
-//  *              phonenumber: 0328038817
-//  *              job_type: Nhan vien thoi vu
-
 /**
  * @swagger
- * tags:
- *  name: Staff
- *  description: The staff managaning API
- */
-
-/**
- * @swagger
- * /staff:
+ * /staffs:
  *   post:
- *     summary: Create a new staff
- *     tags: [Staff]
+ *     tags:
+ *       - Staffs
+ *     summary: Tạo nhân viên mới
+ *     description: Tạo một nhân viên mới và lưu vào cơ sở dữ liệu
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               staffImg:
+ *                 type: string
+ *                 format: binary
+ *               name:
+ *                 type: string
+ *               age:
+ *                 type: integer
+ *               position:
+ *                 type: string
+ *             required:
+ *               - staffImg
+ *               - name
+ *               - age
+ *               - position
+ *     responses:
+ *       '200':
+ *         description: Thành công. Nhân viên được tạo thành công.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Thông báo thành công.
+ *                 staff:
+ *                   $ref: '#/components/schemas/Staff'
+ *       '400':
+ *         description: Yêu cầu không hợp lệ. Thiếu thông tin nhân viên hoặc hình ảnh nhân viên.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Thông báo lỗi.
+ *       '500':
+ *         description: Lỗi server. Không thể tạo nhân viên.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Thông báo lỗi.
+ */
+router.post("/", upload.single("staffImg"), staffController.create);
+/**
+ * @swagger
+ * /staffs/{id}:
+ *   put:
+ *     tags:
+ *       - Staffs
+ *     summary: Cập nhật thông tin nhân viên
+ *     description: Cập nhật thông tin của một nhân viên trong cơ sở dữ liệu
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: ID của nhân viên cần cập nhật
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               staffImg:
+ *                 type: string
+ *                 format: binary
+ *               name:
+ *                 type: string
+ *               age:
+ *                 type: integer
+ *               position:
+ *                 type: string
+ *               birth:
+ *                 type: string
+ *                 format: date
+ *               date:
+ *                 type: string
+ *                 format: date
+ *             required:
+ *               - staffImg
+ *               - name
+ *               - age
+ *               - position
+ *               - birth
+ *               - date
+ *     responses:
+ *       '200':
+ *         description: Thành công. Nhân viên được cập nhật thành công.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Thông báo thành công.
+ *       '400':
+ *         description: Yêu cầu không hợp lệ. Thiếu thông tin nhân viên hoặc hình ảnh nhân viên.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Thông báo lỗi.
+ *       '500':
+ *         description: Lỗi server. Không thể cập nhật nhân viên.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Thông báo lỗi.
+ */
+router.put("/:id", upload.single("staffImg"), staffController.update);
+/**
+ * @swagger
+ * /staffs/delete-many:
+ *   delete:
+ *     tags:
+ *       - Staffs
+ *     summary: Xóa nhiều nhân viên
+ *     description: Xóa nhiều nhân viên khỏi cơ sở dữ liệu
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Staff'
+ *             type: object
+ *             properties:
+ *               ids:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: Mảng chứa ID của các nhân viên cần xóa
+ *             required:
+ *               - ids
+ *     responses:
+ *       '200':
+ *         description: Thành công. Nhân viên đã được xóa thành công.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Thông báo thành công.
+ *       '500':
+ *         description: Lỗi server. Không thể xóa nhân viên.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Thông báo lỗi.
+ */
+router.delete("/delete-many", staffController.deleteMany);
+/**
+ * @swagger
+ * /staffs/{id}:
+ *   delete:
+ *     tags:
+ *       - Staffs
+ *     summary: Xóa nhân viên
+ *     description: Xóa một nhân viên khỏi cơ sở dữ liệu
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID của nhân viên cần xóa
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Thành công. Nhân viên đã được xóa thành công.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Thông báo thành công.
+ *       '404':
+ *         description: Không tìm thấy nhân viên. Không thể xóa nhân viên.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Thông báo lỗi.
+ *       '500':
+ *         description: Lỗi server. Không thể xóa nhân viên.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Thông báo lỗi.
+ */
+router.delete("/:id", staffController.delete);
+/**
+ * @swagger
+ * /staffs/{id}:
+ *   get:
+ *     tags: [Staffs]
+ *     summary: Lấy thông tin nhân viên theo ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID của nhân viên cần lấy thông tin
  *     responses:
  *       200:
- *         description: The staff was successfully created
+ *         description: Thành công - Thông tin nhân viên
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Staff'
- *       500:
- *         description: server Staff error
- */
-
-// staffController.create
-router.post("/", upload.single("staffImg"), staffController.create);
-
-/**
- * @swagger
- * /staff/{id}:
- *  put:
- *    summary: Update the staff by the id
- *    tags: [Staff]
- *    parameters:
- *      - in: path
- *        name: id
- *        schema:
- *          type: string
- *        required: true
- *        description: The staff id
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            $ref: '#/components/schemas/Staff'
- *    responses:
- *      200:
- *        description: The staff was updated
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/Staff'
- *      404:
- *        description: The staff was not found
- *      500:
- *        description: Some error happened
- */
-
-// staffController.update
-router.put("/:id", upload.single("staffImg"), staffController.update);
-
-/**
- * @swagger
- * /staff/delete-many:
- *   delete:
- *     summary: Xóa tất cả nhân viên
- *     tags: [Staff]
- *     responses:
- *       200:
- *         description: Xóa thành công tất cả nhân viên
- *       500:
- *         description: Lỗi hệ thống
- */
-// staffConteoller.deleteMany
-router.delete("/delete-many", staffController.deleteMany);
-
-/**
- * @swagger
- * /staff/{id}:
- *   delete:
- *     summary: Remove the staff by id
- *     tags: [Staff]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: string
- *         required: true
- *         description: The staff id
- *
- *     responses:
- *       200:
- *         description: The staff was deleted
  *       404:
- *         description: The staff was not found
+ *         description: Không tìm thấy - Nhân viên không tồn tại
  */
-
-// staffController.delete
-router.delete("/:id", staffController.delete);
-
+router.use("/:id", staffController.getById);
 /**
  * @swagger
- * /staff/{id}:
+ * /staffs:
  *   get:
- *     summary: Get the staff by id
- *     tags: [Staff]
+ *     tags: [Staffs]
+ *     summary: Lấy danh sách nhân viên
  *     parameters:
- *       - in: path
- *         name: id
+ *       - in: query
+ *         name: limit
  *         schema:
- *           type: string
- *         required: true
- *         description: The staff id
+ *           type: integer
+ *           minimum: 1
+ *           default: 10
+ *         description: Số lượng nhân viên trả về trong mỗi trang
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *         description: Số trang hiện tại
  *     responses:
  *       200:
- *         description: The staff description by id
- *         contents:
+ *         description: Thành công - Danh sách nhân viên
+ *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Staff'
- *       404:
- *         description: The staff was not found
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Staff'
+ *       500:
+ *         description: Lỗi máy chủ - Không thể lấy danh sách nhân viên
  */
-// staffController.getById
-router.use("/:id", staffController.getById);
-
-/**
- * @swagger
- * /staff:
- *  get:
- *    summary: Returns the list of all the staff
- *    tags: [Staff]
- *    responses:
- *      200:
- *        description: The list of the staff
- *        content:
- *          application/json:
- *             schema:
- *              type: array
- *              items:
- *                $ref: '#/components/schemas/Staff'
- */
-
-// staffController.get
 router.use("/", staffController.get);
 
 module.exports = router;
