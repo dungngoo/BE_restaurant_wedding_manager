@@ -169,6 +169,7 @@ router.delete("/deletePendingBookings", bookingController.deletePending);
  *                  type: string
  */
 router.post("/sendEmail", bookingController.sendEmail);
+
 /**
  * @swagger
  * /bookings/exportInvoiceToPDF:

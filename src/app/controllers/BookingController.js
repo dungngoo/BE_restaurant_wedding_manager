@@ -427,7 +427,7 @@ class BookingController {
           },
         },
       ]);
-      const formattedRevenue = totalRevenue[0].total.toLocaleString();
+      const formattedRevenue = totalRevenue[0].total;
       res.json({ totalRevenue: formattedRevenue });
     } catch (error) {
       console.error(error);
@@ -544,27 +544,51 @@ class BookingController {
     // Tính tổng tiền sảnh
     const lobby = booking.lobbyId;
     const lobbyPrice = lobby.price;
+
     totalAmount += lobbyPrice;
 
     // Tính tổng tiền thực đơn
     const menuPrice = await this.calculateMenuTotal(booking.menuId);
-    totalAmount += menuPrice;
+    let totalMenuPrice = 0;
+
+    const menu = await Menu.findById(booking.menuId._id);
+    for (const itemId of menu.items) {
+      const menuItem = await MenuItem.findById(itemId);
+      if (menuItem) {
+        const menuItemPrice = menuItem.price;
+
+        totalMenuPrice += menuItemPrice;
+        doc.text(`Tiền món ăn (${menuItem.name}): ${menuItemPrice.toLocaleString()} VNĐ`);
+      } else {
+        console.log(`Không tìm thấy menuItem với id ${itemId} VNĐ`);
+      }
+    }
+
+    doc.text(`Tổng tiền món ăn (${menu.name}): ${totalMenuPrice.toLocaleString()} VNĐ`);
+    totalMenuPrice = menuPrice * booking.tableQuantity;
+    totalAmount += totalMenuPrice;
+    doc.text(
+      `Tiền thực đơn (số lượng bàn x giá tiền thực đơn): ${totalMenuPrice.toLocaleString()} VNĐ`
+    );
     let servicePrice;
     // Tính tổng tiền dịch vụ
     for (const service of booking.services) {
       const serviceItem = await Service.findById(service.service).populate(""); // Replace '' with the field you want to populate, if applicable
+
       servicePrice = serviceItem.price;
       totalAmount += servicePrice;
     }
+
     console.log(totalAmount);
+    totalAmount += totalMenuPrice;
+
     // Thêm thông tin tổng tiền vào hóa đơn
     doc.fontSize(16).text("Thông tin thanh toán:", { underline: true });
-    doc.text(`Tiền sảnh: ${lobbyPrice}`);
-    doc.text(`Tiền thực đơn: ${menuPrice}`);
-    doc.text(`Tiền dịch vụ: ${servicePrice}`);
+    doc.text(`Tiền sảnh: ${lobbyPrice.toLocaleString()} VNĐ`);
+    doc.text(`Tiền dịch vụ: ${servicePrice.toLocaleString()} VNĐ`);
     // Thêm thông tin tiền dịch vụ
 
-    doc.text(`Tổng cộng: ${totalAmount}`);
+    doc.text(`Tổng cộng: ${totalAmount.toLocaleString()} VNĐ`);
 
     // Kết thúc ghi dữ liệu vào file PDF
     doc.end();
