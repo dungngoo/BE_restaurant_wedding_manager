@@ -48,10 +48,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use((req, res, next) => {
-  res.setHeader(
-    "Access-Control-Allow-Origin",
-    "*"
-  );
+  res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Methods",
     "GET,OPTIONS,PATCH,DELETE,POST,PUT"
@@ -63,7 +60,7 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.static(path.join(__dirname, "public")));
-app.use("/tmp/uploads", express.static("uploads"));
+app.use("/uploads", express.static("uploads"));
 
 app.use(
   bodyParser.urlencoded({
