@@ -63,7 +63,7 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.static(path.join(__dirname, "public")));
-app.use("/uploads", express.static("uploads"));
+app.use("/tmp/uploads", express.static("uploads"));
 
 app.use(
   bodyParser.urlencoded({
