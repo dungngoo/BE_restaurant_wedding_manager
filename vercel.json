@@ -1,5 +1,5 @@
 {
   "version": 2,
   "name": "BE_restaurant_wedding_manager",
-  "routes": [{ "src": "/(.*)", "dest": "src/index.js" }]
+  "routes": [{ "src": "/(.*)", "dest": "/" }]
 }
