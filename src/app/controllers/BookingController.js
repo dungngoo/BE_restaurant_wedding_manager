@@ -532,8 +532,9 @@ class BookingController {
     doc.text(`Email: ${booking.customerId.email}`);
     // Thêm thông tin khách hàng khác nếu cần
     // Thông tin đơn đặt tiệc
+    const dateString = this.convertTimestampToDateString(booking.createdAt);
     doc.fontSize(14).text("Thông tin đơn đặt tiệc:", { underline: true });
-    doc.text(`Ngày đặt tiệc: ${booking.createdAt}`);
+    doc.text(`Ngày đặt tiệc: ${dateString}`);
     doc.text(`Ngày tổ chức tiệc: ${booking.eventDate}`);
     doc.text(`Số lượng bàn: ${booking.tableQuantity}`);
     // Thêm thông tin khác của đơn đặt tiệc
@@ -596,9 +597,7 @@ class BookingController {
       );
       totalAmount += servicePrice;
     }
-    doc.text(
-      `Tổng tiền dịch vụ: ${totalServicePrice.toLocaleString()} VNĐ`
-    );
+    doc.text(`Tổng tiền dịch vụ: ${totalServicePrice.toLocaleString()} VNĐ`);
     doc.text(
       `---------------------------------------------------------------------------------------`
     );
@@ -641,6 +640,15 @@ class BookingController {
         res.status(500).json({ error: "Error exporting invoice" });
       });
   };
+  convertTimestampToDateString(timestamp) {
+    const date = new Date(timestamp);
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+
+    const dateString = `${day}/${month}/${year}`;
+    return dateString;
+  }
 }
 
 module.exports = new BookingController();
