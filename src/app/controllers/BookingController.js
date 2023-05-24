@@ -393,7 +393,7 @@ class BookingController {
         doc.pipe(res);
 
         // Generate the content of the invoice
-        doc.fontSize(16).text("Invoice", { align: "center" }).moveDown(0.5);
+        doc.fontSize(14).text("Invoice", { align: "center" }).moveDown(0.5);
         // Add more content to the invoice as needed using doc.text(), doc.image(), etc.
 
         // End the PDF document
@@ -518,25 +518,28 @@ class BookingController {
   }
   // Hàm xuất hóa đơn dưới dạng PDF
   exportInvoiceToPDF = async (booking) => {
+    console.log(booking);
     const doc = new PDFDocument();
     doc.font("fonts/tiengviet.ttf");
-
+    doc.fontSize(20).text("HÓA ĐƠN", { align: "center" });
+    doc.text(`-------------------------------------------------------------`);
     // Tạo stream để ghi dữ liệu vào file PDF
     const stream = doc.pipe(fs.createWriteStream(`invoice-${booking._id}.pdf`));
-
     // Thông tin khách hàng
-    doc.fontSize(16).text("Thông tin khách hàng:", { underline: true });
+    doc.fontSize(14).text("Thông tin khách hàng:", { underline: true });
     doc.text(`Tên khách hàng: ${booking.customerId.name}`);
     doc.text(`Số điện thoại: ${booking.customerId.phone}`);
     doc.text(`Email: ${booking.customerId.email}`);
     // Thêm thông tin khách hàng khác nếu cần
-
     // Thông tin đơn đặt tiệc
-    doc.fontSize(16).text("Thông tin đơn đặt tiệc:", { underline: true });
+    doc.fontSize(14).text("Thông tin đơn đặt tiệc:", { underline: true });
     doc.text(`Ngày đặt tiệc: ${booking.createdAt}`);
     doc.text(`Ngày tổ chức tiệc: ${booking.eventDate}`);
     doc.text(`Số lượng bàn: ${booking.tableQuantity}`);
     // Thêm thông tin khác của đơn đặt tiệc
+    doc.text(
+      `---------------------------------------------------------------------------------------`
+    );
 
     // Tính tổng tiền
     let totalAmount = 0;
@@ -558,34 +561,53 @@ class BookingController {
         const menuItemPrice = menuItem.price;
 
         totalMenuPrice += menuItemPrice;
-        doc.text(`Tiền món ăn (${menuItem.name}): ${menuItemPrice.toLocaleString()} VNĐ`);
+        doc.text(
+          `Tiền món ăn (${
+            menuItem.name
+          }): ${menuItemPrice.toLocaleString()} VNĐ`
+        );
       } else {
-        console.log(`Không tìm thấy menuItem với id ${itemId} VNĐ`);
+        console.log(`Không tìm thấy menuItem với id ${itemId}`);
       }
     }
 
-    doc.text(`Tổng tiền món ăn (${menu.name}): ${totalMenuPrice.toLocaleString()} VNĐ`);
+    doc.text(
+      `Tổng tiền món ăn (${menu.name}): ${totalMenuPrice.toLocaleString()} VNĐ`
+    );
     totalMenuPrice = menuPrice * booking.tableQuantity;
-    totalAmount += totalMenuPrice;
     doc.text(
       `Tiền thực đơn (số lượng bàn x giá tiền thực đơn): ${totalMenuPrice.toLocaleString()} VNĐ`
     );
+    doc.text(
+      `---------------------------------------------------------------------------------------`
+    );
+
     let servicePrice;
+    let totalServicePrice = 0;
     // Tính tổng tiền dịch vụ
     for (const service of booking.services) {
-      const serviceItem = await Service.findById(service.service).populate(""); // Replace '' with the field you want to populate, if applicable
-
+      const serviceItem = await Service.findById(service.service).populate("");
       servicePrice = serviceItem.price;
+      totalServicePrice += servicePrice;
+      doc.text(
+        `Tiền dịch vụ (${
+          serviceItem.serviceName
+        }): ${servicePrice.toLocaleString()} VNĐ`
+      );
       totalAmount += servicePrice;
     }
-
-    console.log(totalAmount);
+    doc.text(
+      `Tổng tiền dịch vụ: ${totalServicePrice.toLocaleString()} VNĐ`
+    );
+    doc.text(
+      `---------------------------------------------------------------------------------------`
+    );
     totalAmount += totalMenuPrice;
+    console.log(totalAmount);
 
     // Thêm thông tin tổng tiền vào hóa đơn
-    doc.fontSize(16).text("Thông tin thanh toán:", { underline: true });
+    doc.fontSize(14).text("Thông tin thanh toán:", { underline: true });
     doc.text(`Tiền sảnh: ${lobbyPrice.toLocaleString()} VNĐ`);
-    doc.text(`Tiền dịch vụ: ${servicePrice.toLocaleString()} VNĐ`);
     // Thêm thông tin tiền dịch vụ
 
     doc.text(`Tổng cộng: ${totalAmount.toLocaleString()} VNĐ`);
