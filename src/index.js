@@ -43,6 +43,7 @@ const corsOptions = {
   origin: [
     "http://localhost:3000",
     "https://dhpalace-restaurant-cli.vercel.app",
+    "http://13.212.21.43:3000",
   ],
 };
 
