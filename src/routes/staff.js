@@ -65,6 +65,8 @@ const staffController = require("../app/controllers/staffController");
  *           format: date-time
  *           description: Ngày cập nhật
  */
+router.post("/calculateSalary", staffController.calculateSalary);
+
 /**
  * @swagger
  * /staffs:

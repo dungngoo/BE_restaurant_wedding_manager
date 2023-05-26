@@ -4,6 +4,8 @@ const express = require("express");
 const multer = require("multer");
 const fs = require("fs");
 const aws = require("aws-sdk");
+const mongoose = require("mongoose");
+const xlsx = require("xlsx");
 const multerS3 = require("multer-s3");
 const Staff = require("../models/Staff");
 const { uploadFile, updateFile, deleteFile } = require("../middlewares/s3");
@@ -176,6 +178,36 @@ class StaffController {
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: "Đã xảy ra lỗi khi xóa nhân viên" });
+    }
+  }
+  async calculateSalary(req, res) {
+    try {
+      const { numMonths, monthlySalary, isPaid, _id } = req.body;
+      console.log(numMonths);
+      console.log(monthlySalary);
+      console.log(isPaid);
+      console.log(_id);
+      // Tìm nhân viên theo ID
+      const staff = await Staff.findById(_id);
+
+      if (!staff) {
+        return res.status(404).json({ message: "Nhân viên không tồn tại" });
+      }
+
+      // Cập nhật số tháng làm và tiền lương mỗi tháng
+      staff.months_worked = numMonths;
+      staff.monthly_wage = monthlySalary;
+
+      // Cập nhật trạng thái đã trả lương
+      staff.isSalaryPaid = isPaid;
+
+      // Lưu nhân viên đã cập nhật
+      await staff.save();
+
+      res.status(200).json({ message: "Tính lương thành công" });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Đã xảy ra lỗi khi tính lương" });
     }
   }
 }
