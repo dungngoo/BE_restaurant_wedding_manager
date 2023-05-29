@@ -26,6 +26,10 @@ const eventSchema = new Schema(
       ref: "ServiceType",
       required: true,
     },
+    decorationPackageId: {
+      type: Schema.Types.ObjectId,
+      ref: "DecorationPackage",
+    },
     services: [
       {
         service: {
