@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 
-const middlewareController = require("../app/controllers/MiddlewareController");
 const adminController = require("../app/controllers/AdminController");
 
 /**
