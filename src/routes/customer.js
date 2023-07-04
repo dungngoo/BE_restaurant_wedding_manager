@@ -1,7 +1,7 @@
 const express = require("express");
-const router = express.Router();
+const router = express.Router();d:
 
-const customerController = require("../app/controllers/customerController.js");
+const customerController = require("d:/QuanLyNhaHangTiecCuoi/BE/src/app/controllers/customerController");
 
 /**
  * @swagger
