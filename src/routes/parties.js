@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const partyController = require("../app/controllers/partyController");
+const partyController = require("../app/controllers/PartyController");
 /**
  * @swagger
  * components:

@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
-const staffController = require("../app/controllers/staffController");
+const staffController = require("../app/controllers/StaffController");
 /**
  * @swagger
  * components:

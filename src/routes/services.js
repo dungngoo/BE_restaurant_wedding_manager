@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const ServiceController = require("../app/controllers/serviceController");
+const ServiceController = require("../app/controllers/ServiceController");
 /**
  * @swagger
  * components:

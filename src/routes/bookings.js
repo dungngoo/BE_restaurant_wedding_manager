@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const bookingController = require("../app/controllers/bookingController");
+const bookingController = require("../app/controllers/BookingController");
 
 /**
  * @swagger

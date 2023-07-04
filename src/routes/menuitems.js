@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const MenuItemController = require("../app/controllers/menuItemController");
+const MenuItemController = require("../app/controllers/MenuItemController");
 /**
  * @swagger
  * /menuitems/type:
