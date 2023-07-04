@@ -1,5 +1,5 @@
 const express = require("express");
-const router = express.Router();d:
+const router = express.Router();
 
 const customerController = require("d:/QuanLyNhaHangTiecCuoi/BE/src/app/controllers/customerController");
 
