@@ -19,7 +19,12 @@ const options = {
     },
     servers: [
       {
-        url: "http://localhost:3001" || "http://13.212.26.39:3001/" || "https://nhahang.dungngooubuntu.click/" || 'https://nhahangtieccuoidh-3prb8uflh-dungngoo.vercel.app/'
+        url:
+          "http://localhost:3001" ||
+          "http://13.212.26.39:3001/" ||
+          "https://nhahang.dungngooubuntu.click/" ||
+          "https://nhahangtieccuoidh-3prb8uflh-dungngoo.vercel.app/" ||
+          "https://nhahangtieccuoidh.vercel.app/",
       },
     ],
   },
@@ -44,7 +49,7 @@ const corsOptions = {
     "http://localhost:3000",
     "https://dhpalace-restaurant-cli.vercel.app",
     "http://13.212.21.43:3000",
-    "https://nhahang.dungngooubuntu.click"
+    "https://nhahang.dungngooubuntu.click",
   ],
 };
 
