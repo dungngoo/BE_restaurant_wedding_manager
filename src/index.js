@@ -50,6 +50,7 @@ const corsOptions = {
     "https://dhpalace-restaurant-cli.vercel.app",
     "http://13.212.21.43:3000",
     "https://nhahang.dungngooubuntu.click",
+    "https://nhahangtieccuoidh.vercel.app/",
   ],
 };
 
@@ -60,7 +61,7 @@ app.use((req, res, next) => {
     "Access-Control-Allow-Methods",
     "GET,OPTIONS,PATCH,DELETE,POST,PUT"
   );
-  res.setHeader(
+  res.setHeader(  
     "Access-Control-Allow-Headers",
     "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
   );
